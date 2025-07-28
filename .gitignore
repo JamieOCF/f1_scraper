@@ -1,4 +1,8 @@
-notes.txt
+# Created by venv; see https://docs.python.org/3/library/venv.html
 .vscode
+Include
+Lib
+Scripts
+notes.txt
+pyvenv.cfg
 test.py
-.gitignore
