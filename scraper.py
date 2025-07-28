@@ -1,6 +1,6 @@
 import json
 
-import requests, selenium, lxml, schedule, pyautogui
+import requests
 from bs4 import BeautifulSoup
 
 from datetime import datetime
