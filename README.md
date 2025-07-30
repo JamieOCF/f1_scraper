@@ -3,7 +3,7 @@ Web scraper that takes the data of all f1 drivers' and constructors' championshi
 
 
 ## Running Program
-- Download repo files into a directory
+- Download repo files into a directory or `git clone https://github.com/JamieOCF/f1_scraper.git`
 - Run `pip install -r requirements.txt` in the directory
 - Run the scraper.py file
 
