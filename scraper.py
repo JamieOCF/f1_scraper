@@ -170,7 +170,15 @@ class standingsApp():
 
     def function_choice(self):
         while True:
-            print("\n=====Choose Function===== \n 1. Collect WDC Standings \n 2. Collect WCC Standings \n 3. View WDC Standings \n 4. View WCC Standings \n 0. Exit")
+            wdc_is_scraped = True if open("wdc.json").read() != "" else False
+            wcc_is_scraped = True if open("wcc.json").read() != "" else False
+
+            print("\n=====Choose Function===== \n 1. Collect WDC Standings \n 2. Collect WCC Standings")
+            if wdc_is_scraped:
+                print(" 3. View WDC Standings")
+            if wcc_is_scraped:
+                print(" 4. View WCC Standings")
+            print(" 0. Exit")
 
             try:
                 choice = int(input("Enter choice --> "))
@@ -185,9 +193,15 @@ class standingsApp():
                 case 2:
                     self.collect_wcc_standings()
                 case 3:
-                    self.view_wdc_standings()
+                    if wdc_is_scraped:
+                        self.view_wdc_standings()
+                    else:
+                        print("Collect WDC data first!")
                 case 4:
-                    self.view_wcc_standings()
+                    if wcc_is_scraped:
+                        self.view_wcc_standings()
+                    else:
+                        print("Collect WCC data first!")
                 case 0:
                     print("Goodbye!")
                     exit()
