@@ -8,5 +8,5 @@ Web scraper that takes the data of all f1 drivers' and constructors' championshi
 - Run the scraper.py file
 
 ## Collecting and Viewing Data
-- 1/2: Collect all drivers' or constructors' championships into respective JSON files.
-- 3/4: View drivers' and constructors' championships of any year
+- 1: Collect all drivers' and constructors' championships into respective JSON files.
+- 2/3: View drivers' and constructors' championships of any year
