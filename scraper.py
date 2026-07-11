@@ -10,6 +10,10 @@ from datetime import datetime
 this_year = int((str(datetime.today().strftime("%d/%m/%Y")))[-4:])
 
 class standingsApp():
+    def collect_standings(self):
+        self.collect_wdc_standings()
+        self.collect_wcc_standings()
+
     def collect_wdc_standings(self):
         all_wdc_standings = {}
         driver_stats = {}
@@ -23,7 +27,7 @@ class standingsApp():
             parsed_html = BeautifulSoup(response.content, 'html.parser')
 
             #get all table rows with each driver's details
-            tr_all_drivers = parsed_html.find_all("tr", "hover:bg-[rgb(from_var(--f1rd-colour-surface-neutral-surface-neutral-11)_r_g_b_/_0.03)]")
+            tr_all_drivers = parsed_html.find_all("tr", "Table-module_body-row__shKd-")
          
             #check if new year but before season has started
             if year == this_year and len(tr_all_drivers) == 0:
@@ -31,36 +35,40 @@ class standingsApp():
                 break
 
             #iterate for individual driver's details
-            for ranking, tr_each_driver in enumerate(tr_all_drivers):
-                p_driver_data = tr_each_driver.find_all("p", class_="typography-module_body-s-semibold__O2lOH")
+            for ranking, driver in enumerate(tr_all_drivers): #driver = tr tag with class "Table-module_body-row__shKd-"
 
-                #iterate through a driver's details
-                for index, p_element in enumerate(p_driver_data):
-
-                    if index == 0:
-                        position = p_element.text
+                #get position, name, nationality, team, points of driver
+                count = 0
+                for td in driver:
+                    if count == 0:
+                        position = td.text
 
                     #get driver's name and abbreviated name --> Abbr name gets stuck on to end of full name when using p_element.text, hence the slicing
-                    elif index == 1:
-                        driver_name = str(p_element.text[:-3]).replace("\xa0", " ")
-                        driver_abbr = p_element.text[-3:]
+                    elif count == 1:
+                        # driver_name = str(td.text[:-3]).replace("\xa0", " ")
+                        driver_name = str(td.text[:-3]).split()
+                        driver_name = " ".join(driver_name)
 
-                    elif index == 2:
-                        nationality = p_element.text
+                        driver_abbr = td.text[-3:]
+
+                    elif count == 2:
+                        nationality = td.text
 
                     #get the driver's team, set default if driver didn't have a team
-                    elif index == 3:
-                        constructor = p_element.text or "No Team"
+                    elif count == 3:
+                        constructor = td.text or "No Team"
 
-                    elif index == 4:
-                        points = p_element.text
+                    elif count == 4:
+                        points = td.text
 
                     #idk, i have silly brain :P
                     else:
                         print(":3")
+                    
+                    count += 1
 
                 #create dictionary of driver's stats/info, copy appended so dicts in list are not overridden and become uniform
-                driver_stats.update({"POSITION":position , "NAME": driver_name , "ABBREVIATION":driver_abbr , 
+                driver_stats.update({"POSITION":position , "NAME":driver_name , "ABBREVIATION":driver_abbr , 
                                         "NATIONALITY":nationality , "CONSTRUCTOR":constructor , "POINTS":points})
                 all_wdc_standings[year][ranking+1] = driver_stats.copy()
 
@@ -83,7 +91,7 @@ class standingsApp():
             parsed_html = BeautifulSoup(response.content, 'html.parser')
 
             #get all table rows with each team's details
-            tr_all_teams = parsed_html.find_all("tr", "hover:bg-[rgb(from_var(--f1rd-colour-surface-neutral-surface-neutral-11)_r_g_b_/_0.03)]")
+            tr_all_teams = parsed_html.find_all("tr", "Table-module_body-row__shKd-")
          
             #check if new year but before season has started
             if year == this_year and len(tr_all_teams) == 0:
@@ -91,27 +99,29 @@ class standingsApp():
                 break
 
             #iterate for individual team's details
-            for ranking, tr_each_driver in enumerate(tr_all_teams):
-                p_team_data = tr_each_driver.find_all("p", class_="typography-module_body-s-semibold__O2lOH")
+            for ranking, constructor in enumerate(tr_all_teams):
 
-                #iterate through a teams's details
-                for index, p_element in enumerate(p_team_data):
+                #get position, name and points of the constructor
+                count = 0
+                for td in constructor:
 
-                    if index == 0:
-                        position = p_element.text
+                    if count == 0:
+                        position = td.text
 
-                    elif index == 1:
-                        team_name = p_element.text
+                    elif count == 1:
+                        team_name = td.text
 
-                    elif index == 2:
-                        points = p_element.text
+                    elif count == 2:
+                        points = td.text
 
                     #brain == mush --> True :3
                     else:
                         print(":3")
 
+                    count += 1
+
                 #create dictionary of team's stats/info, copy appended so dicts in list are not overridden and become uniform
-                team_stats.update({"POSITION":position , "CONSTRUCTOR": team_name , "POINTS":points})
+                team_stats.update({"POSITION":position , "CONSTRUCTOR":team_name , "POINTS":points})
                 all_wcc_standings[year][ranking+1] = team_stats.copy()
 
         with open("wcc.json", "w") as outFile:
@@ -173,11 +183,11 @@ class standingsApp():
             wdc_is_scraped = True if open("wdc.json").read() != "" else False
             wcc_is_scraped = True if open("wcc.json").read() != "" else False
 
-            print("\n=====Choose Function===== \n 1. Collect WDC Standings \n 2. Collect WCC Standings")
+            print("\n=====Choose Function===== \n 1. Collect Standings")
             if wdc_is_scraped:
-                print(" 3. View WDC Standings")
+                print(" 2. View WDC Standings")
             if wcc_is_scraped:
-                print(" 4. View WCC Standings")
+                print(" 3. View WCC Standings")
             print(" 0. Exit")
 
             try:
@@ -189,15 +199,13 @@ class standingsApp():
 
             match choice:
                 case 1:
-                    self.collect_wdc_standings()
+                    self.collect_standings()
                 case 2:
-                    self.collect_wcc_standings()
-                case 3:
                     if wdc_is_scraped:
                         self.view_wdc_standings()
                     else:
                         print("Collect WDC data first!")
-                case 4:
+                case 3:
                     if wcc_is_scraped:
                         self.view_wcc_standings()
                     else:
